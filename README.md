@@ -31,6 +31,7 @@ By the end of the project, the following components will be developed:
 - Learn how to implement CRUD operations through an API.
 - Develop a full-stack web application.
 
-## License
+## Sources/Material Used
 
-This project is licensed under the MIT License.
+- ChatGPT
+- Youtube - RANDOMMAL
