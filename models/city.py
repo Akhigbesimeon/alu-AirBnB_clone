@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #!/usr/bin/python
 """ holds class City"""
 import models
@@ -22,3 +23,18 @@ class City(BaseModel, Base):
     def __init__(self, *args, **kwargs):
         """initializes city"""
         super().__init__(*args, **kwargs)
+=======
+#!/usr/bin/python3
+# """ City Module for HBNB project """
+# from models.base_model import BaseModel
+#
+#
+# class City(BaseModel):
+#     """ The city class, contains state ID and name """
+#     state_id = ""
+#     name = ""
+
+# Define the function to test
+def multiply(a, b):
+    return a * b
+>>>>>>> d4332695e584bd8b09bf0388846da9be6ad82e03
