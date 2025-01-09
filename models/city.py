@@ -1,4 +1,5 @@
-#!/usr/bin/python3
-# Define the function to test
-def multiply(a, b):
-    return a * b
+from models.base_model import BaseModel
+
+class City(BaseModel):
+    """Represents a city."""
+    name = ""
