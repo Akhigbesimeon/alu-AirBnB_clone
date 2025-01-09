@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import sqlite3
 from models.base_model import BaseModel
 
