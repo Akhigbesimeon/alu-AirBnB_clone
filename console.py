@@ -41,10 +41,11 @@ if os.path.exists("switch_to_file_storage.py"):
 
 """
 """
-with open('console.txt', 'r') as file_i:  
-    console_lines = file_i.readlines() 
-    for line in console_lines:
-        print(line)
+with open('console.txt', 'r') as file_i:
+    console_lines = file_i.readlines()   
+    in_main = False                      
+    for line in console_lines:            
+        print(line)                      
 with open("console.py", "w") as file_o:
 in_main = False
 for line in console_lines:
