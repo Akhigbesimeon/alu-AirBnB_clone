@@ -1,6 +1,6 @@
 # Create the test case for city
 import unittest
-from models.city import multiply
+from models.city import multiply testing...
 class TestMult(unittest.TestCase):
     def test_multiply(self):
         self.assertEqual(multiply(2, 4), 8)  # 2 * 4 = 8
