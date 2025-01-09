@@ -1,319 +1,166 @@
-#!/usr/bin/python
-"""
-Module for console
-"""
+#!/usr/bin/python3
+import inspect
+import io
+import sys
 import cmd
-import re
-import shlex
-import ast
-from models import storage
-from models.base_model import BaseModel
-from models.user import User
-from models.amenity import Amenity
-from models.place import Place
-from models.review import Review
-from models.state import State
-from models.city import City
+import shutil
 
-
-
-def split_curly_braces(e_arg):
-    """
-    Splits the curly braces for the update method
-    """
-    curly_braces = re.search(r"\{(.*?)\}", e_arg)
-
-    if curly_braces:
-        id_with_comma = shlex.split(e_arg[:curly_braces.span()[0]])
-        id = [i.strip(",") for i in id_with_comma][0]
-
-        str_data = curly_braces.group(1)
-        try:
-            arg_dict = ast.literal_eval("{" + str_data + "}")
-        except Exception:
-            print("**  invalid dictionary format **")
-            return
-        return id, arg_dict
-    else:
-        commands = e_arg.split(",")
-        if commands:
-            try:
-                id = commands[0]
-            except Exception:
-                return "", ""
-            try:
-                attr_name = commands[1]
-            except Exception:
-                return id, ""
-            try:
-                attr_value = commands[2]
-            except Exception:
-                return id, attr_name
-            return f"{id}", f"{attr_name} {attr_value}"
-
-class HBNBCommand(cmd.Cmd):
-    """
-    HBNBCommand console class
-    """
-    prompt = "(hbnb) "
-    valid_classes = ["BaseModel", "User", "Amenity",
-                     "Place", "Review", "State", "City"]
-
-    def emptyline(self):
-        """
-        Do nothing when an empty line is entered.
-        """
+"""
+Cleanup file storage
+"""
+import os
+file_path = "file.json"
+if not os.path.exists(file_path):
+    try:
+        from models.engine.file_storage import FileStorage
+        file_path = FileStorage._FileStorage__file_path
+    except:
         pass
+if os.path.exists(file_path):
+    os.remove(file_path)
 
-    def do_EOF(self, arg):
-        """
-        EOF (Ctrl+D) signal to exit the program.
-        """
-        return True
+"""
+Backup console file
+"""
+if os.path.exists("tmp_console_main.py"):
+    shutil.copy("tmp_console_main.py", "console.py")
+shutil.copy("console.py", "tmp_console_main.py")
 
-    def do_quit(self, arg):
-        """
-        Quit command to exit the program.
-        """
-        return True
-        
+"""
+Backup models/__init__.py file
+"""
+if os.path.exists("models/tmp__init__.py"):
+    shutil.copy("models/tmp__init__.py", "models/__init__.py")
+shutil.copy("models/__init__.py", "models/tmp__init__.py")
 
-    def do_create(self, arg):
-        """
-        Create a new instance of BaseModel and save it to the JSON file.
-        Usage: create <class_name>
-        """
-        try:
-            class_name = arg.split(" ")[0]
-            if len(class_name) == 0:
-                print("** class name missing **")
-                return
-            if class_name and class_name not in self.valid_classes:
-                print("** class doesn't exist **")
-                return
+"""
+Overwrite models/__init__.py file with switch_to_file_storage.py
+"""
+if os.path.exists("switch_to_file_storage.py"):
+    shutil.copy("switch_to_file_storage.py", "models/__init__.py")
 
-            kwargs = {}
-            commands = arg.split(" ")
-            for i in range(1, len(commands)):
-                
-                key = commands[i].split("=")[0]
-                value = commands[i].split("=")[1]
-                #key, value = tuple(commands[i].split("="))
-                if value.startswith('"'):
-                    value = value.strip('"').replace("_", " ")
-                else:
-                    try:
-                        value = eval(value)
-                    except (SyntaxError, NameError):
-                        continue
-                kwargs[key] = value
-
-            if kwargs == {}:
-                new_instance = eval(class_name)()
+"""
+Updating console to remove "__main__"
+"""
+with open("tmp_console_main.py", "r") as file_i:
+    console_lines = file_i.readlines()
+    with open("console.py", "w") as file_o:
+        in_main = False
+        for line in console_lines:
+            if "__main__" in line:
+                in_main = True
+            elif in_main:
+                if "cmdloop" not in line:
+                    file_o.write(line.lstrip("    ")) 
             else:
-                new_instance = eval(class_name)(**kwargs)
-            storage.new(new_instance)
-            print(new_instance.id)
-            storage.save()
-        except ValueError:
-            print(ValueError)
-            return
+                file_o.write(line)
 
-    def do_show(self, arg):
-        """
-        Show the string representation of an instance.
-        Usage: show <class_name> <id>
-        """
-        commands = shlex.split(arg)
+import console
 
-        if len(commands) == 0:
-            print("** class name missing **")
-        elif commands[0] not in self.valid_classes:
-            print("** class doesn't exist **")
-        elif len(commands) < 2:
-            print("** instance id missing **")
-        else:
-            objects = storage.all()
+"""
+ Create console
+"""
+console_obj = "HBNBCommand"
+for name, obj in inspect.getmembers(console):
+    if inspect.isclass(obj) and issubclass(obj, cmd.Cmd):
+        console_obj = obj
 
-            key = "{}.{}".format(commands[0], commands[1])
-            if key in objects:
-                print(objects[key])
-            else:
-                print("** no instance found **")
+my_console = console_obj(stdout=io.StringIO(), stdin=io.StringIO())
+my_console.use_rawinput = False
 
-    def do_destroy(self, arg):
-        """
-        Delete an instance based on the class name and id.
-        Usage: destroy <class_name> <id>
-        """
-        commands = shlex.split(arg)
+"""
+ Exec command
+"""
+def exec_command(my_console, the_command, last_lines = 1):
+    my_console.stdout = io.StringIO()
+    real_stdout = sys.stdout
+    sys.stdout = my_console.stdout
+    my_console.onecmd(the_command)
+    sys.stdout = real_stdout
+    lines = my_console.stdout.getvalue().split("\n")
+    return "\n".join(lines[(-1*(last_lines+1)):-1])
 
-        if len(commands) == 0:
-            print("** class name missing **")
-        elif commands[0] not in self.valid_classes:
-            print("** class doesn't exist **")
-        elif len(commands) < 2:
-            print("** instance id missing **")
-        else:
-            objects = storage.all()
-            key = "{}.{}".format(commands[0], commands[1])
-            if key in objects:
-                del objects[key]
-                storage.save()
-            else:
-                print("** no instance found **")
+"""
+ Tests
+"""
+state_name = "California"
+result = exec_command(my_console, "create State name=\"{}\"".format(state_name))
+if result is None or result == "":
+    print("FAIL: No ID retrieved")
 
-    def do_all(self, arg):
-        """
-        Print the string representation of all instances or a specific class.
-        Usage: <User>.all()
-                <User>.show()
-        """
-        objects = storage.all()
+state_id = result
 
-        commands = shlex.split(arg)
+city_name = "San Francisco is super cool"
+result = exec_command(my_console, "create City state_id=\"{}\" name=\"{}\"".format(state_id, city_name.replace(" ", "_")))
+# create City state_id="d363d0fc-509c-4b29-81d0-1ae0b4b7025f" city_name="San_Francisco_is_super_cool"
+if result is None or result == "":
+    print("FAIL: No ID retrieved")
 
-        if len(commands) == 0:
-            for key, value in objects.items():
-                print(str(value))
-        elif commands[0] not in self.valid_classes:
-            print("** class doesn't exist **")
-        else:
-            for key, value in objects.items():
-                if key.split('.')[0] == commands[0]:
-                    print(str(value))
-        
-    def do_count(self, arg):
-        """
-        Counts and retrieves the number of instances of a class
-        usage: <class name>.count()
-        """
-        objects = storage.all()
+city_id = result
 
-        commands = shlex.split(arg)
+user_email = "my@me.com"
+user_pwd = "pwd"
+user_fn = "FN"
+user_ln = "LN"
+result = exec_command(my_console, "create User email=\"{}\" password=\"{}\" frist_name=\"{}\" last_name=\"{}\"".format(user_email, user_pwd, user_fn, user_ln))
+if result is None or result == "":
+    print("FAIL: No ID retrieved")
 
-        if arg:
-            incoming_class_name = commands[0]
-        count = 0
+user_id = result
 
-        if commands:
-            if incoming_class_name in self.valid_classes:
-                for obj in objects.values():
-                    if obj.__class__.__name__ == incoming_class_name:
-                        count += 1
-                print(count)
-            else:
-                print("** invalid class name **")
-        else:
-            print("** class name missing **")
+place_name = "My house"
+place_desc = "no description yet"
+place_nb_rooms = 4
+place_nb_bath = 0
+place_max_guests = -3
+place_price = 100
+place_lat = -120.12
+place_lon = 0.41921928
+result = exec_command(my_console, "create Place city_id=\"{}\" user_id=\"{}\" name=\"{}\" description=\"{}\" number_rooms={} number_bathrooms={} max_guest={} price_by_night={} latitude={} longitude={}".format(city_id, user_id, place_name.replace(" ", "_"), place_desc.replace(" ", "_"), place_nb_rooms, place_nb_bath, place_max_guests, place_price, place_lat, place_lon))
+if result is None or result == "":
+    print("FAIL: No ID retrieved")
 
-    def do_update(self, arg):
-        """
-        Update an instance by adding or updating an attribute.
-        Usage: update <class_name> <id> <attribute_name> "<attribute_value>"
-        """
-        commands = shlex.split(arg)
+place_id = result
 
-        if len(commands) == 0:
-            print("** class name missing **")
-        elif commands[0] not in self.valid_classes:
-            print("** class doesn't exist **")
-        elif len(commands) < 2:
-            print("** instance id missing **")
-        else:
-            objects = storage.all()
+result = exec_command(my_console, "show Place {}".format(place_id))
+if result is None or result == "":
+    print("FAIL: empty output")
 
-            key = "{}.{}".format(commands[0], commands[1])
-            if key not in objects:
-                print("** no instance found **")
-            elif len(commands) < 3:
-                print("** attribute name missing **")
-            elif len(commands) < 4:
-                print("** value missing **")
-            else:
-                obj = objects[key]
-                curly_braces = re.search(r"\{(.*?)\}", arg)
+if "[Place]" not in result or place_id not in result:
+    print("FAIL: wrong output format: \"{}\"".format(result))
 
-                if curly_braces:
-                    # added to catch errors
-                    try:
-                        str_data = curly_braces.group(1)
+if "city_id" not in result or city_id not in result:
+    print("FAIL: missing new information: \"{}\"".format(result))
 
-                        arg_dict = ast.literal_eval("{" + str_data + "}")
+if "user_id" not in result or user_id not in result:
+    print("FAIL: missing new information: \"{}\"".format(result))
 
-                        attribute_names = list(arg_dict.keys())
-                        attribute_values = list(arg_dict.values())
-                        # added to catch exception
-                        try:
-                            attr_name1 = attribute_names[0]
-                            attr_value1 = attribute_values[0]
-                            setattr(obj, attr_name1, attr_value1)
-                        except Exception:
-                            pass
-                        try:
-                            # added to catch exception
-                            attr_name2 = attribute_names[1]
-                            attr_value2 = attribute_values[1]
-                            setattr(obj, attr_name2, attr_value2)
-                        except Exception:
-                            pass
-                    except Exception:
-                        pass
-                else:
+if "name" not in result or place_name not in result:
+    print("FAIL: missing new information: \"{}\"".format(result))
 
-                    attr_name = commands[2]
-                    attr_value = commands[3]
+if "description" not in result or place_desc not in result:
+    print("FAIL: missing new information: \"{}\"".format(result))
 
-                    try:
-                        attr_value = eval(attr_value)
-                    except Exception:
-                        pass
-                    setattr(obj, attr_name, attr_value)
+if "number_rooms" not in result or str(place_nb_rooms) not in result:
+    print("FAIL: missing new information: \"{}\"".format(result))
 
-                obj.save()
-    
-    def default(self, arg):
-        """
-        Default behavior for cmd module when input is invalid
-        """
-        arg_list = arg.split('.')
+if "number_bathrooms" not in result or str(place_nb_bath) not in result:
+    print("FAIL: missing new information: \"{}\"".format(result))
 
-        cls_nm = arg_list[0]  # incoming class name
+if "max_guest" not in result or str(place_max_guests) not in result:
+    print("FAIL: missing new information: \"{}\"".format(result))
 
-        command = arg_list[1].split('(')
+if "price_by_night" not in result or str(place_price) not in result:
+    print("FAIL: missing new information: \"{}\"".format(result))
 
-        cmd_met = command[0]  # incoming command method
+if "latitude" not in result or str(place_lat) not in result:
+    print("FAIL: missing new information: \"{}\"".format(result))
 
-        e_arg = command[1].split(')')[0]  # extra arguments
+if "longitude" not in result or str(place_lon) not in result:
+    print("FAIL: missing new information: \"{}\"".format(result))
 
-        method_dict = {
-                'all': self.do_all,
-                'show': self.do_show,
-                'destroy': self.do_destroy,
-                'update': self.do_update,
-                'count': self.do_count
-                }
 
-        if cmd_met in method_dict.keys():
-            if cmd_met != "update":
-                return method_dict[cmd_met]("{} {}".format(cls_nm, e_arg))
-            else:
-                if not cls_nm:
-                    print("** class name missing **")
-                    return
-                try:
-                    obj_id, arg_dict = split_curly_braces(e_arg)
-                except Exception:
-                    pass
-                try:
-                    call = method_dict[cmd_met]
-                    return call("{} {} {}".format(cls_nm, obj_id, arg_dict))
-                except Exception:
-                    pass
-        else:
-            print("*** Unknown syntax: {}".format(arg))
-            return False
-    
+print("OK", end="")
 
-if __name__ == '__main__':
-    HBNBCommand().cmdloop()
+shutil.copy("tmp_console_main.py", "console.py")
+shutil.copy("models/tmp__init__.py", "models/__init__.py")
