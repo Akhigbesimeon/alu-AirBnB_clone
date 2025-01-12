@@ -1,6 +1,5 @@
 import uuid
 from datetime import datetime
-from models.engine.file_storage import FileStorage
 
 class BaseModel:
     """
@@ -36,6 +35,8 @@ class BaseModel:
         Updates the `updated_at` attribute with the current datetime and saves the instance.
         """
         self.updated_at = datetime.now()  # Update the `updated_at` field
+        # Lazy import to avoid circular import
+        from models.engine.file_storage import FileStorage
         storage = FileStorage()
         storage.new(self)  # Add the instance to storage
         storage.save()  # Save to the file
