@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-
 """
 Entry point of the command interpreter for the HBNB project.
 This module uses the cmd module to create an interactive shell.
