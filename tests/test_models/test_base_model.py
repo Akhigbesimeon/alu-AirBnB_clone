@@ -2,6 +2,7 @@
 import unittest
 from models.base_model import BaseModel
 from datetime import datetime
+from models.engine.file_storage import FileStorage
 
 class TestBaseModel(unittest.TestCase):
     def test_base_model(self):
