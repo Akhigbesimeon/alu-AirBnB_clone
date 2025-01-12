@@ -43,16 +43,20 @@ class BaseModel:
 
     def to_dict(self):
         """
-        Returns a dictionary representation of the instance.
+        Returns a dictionary representation of the instance that is JSON serializable.
         """
-        # Create a copy of __dict__ to ensure original data isn't modified
-        dict_representation = self.__dict__.copy()
+        dict_representation = self.__dict__.copy()  # Copy the instance's dictionary
 
-        # Add class name to the dictionary
-        dict_representation["__class__"] = self.__class__.__name__
-
-        # Convert `created_at` and `updated_at` to ISO format strings
+        # Convert datetime attributes to ISO format strings
         dict_representation["created_at"] = self.created_at.isoformat()
         dict_representation["updated_at"] = self.updated_at.isoformat()
+
+        # Add class name to the dictionary for identification
+        dict_representation["__class__"] = self.__class__.__name__
+
+        # Ensure all values in the dictionary are JSON serializable
+        for key, value in dict_representation.items():
+            if isinstance(value, datetime):
+                dict_representation[key] = value.isoformat()
 
         return dict_representation
