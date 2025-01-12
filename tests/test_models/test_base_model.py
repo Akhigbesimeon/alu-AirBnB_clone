@@ -33,13 +33,22 @@ class TestBaseModel(unittest.TestCase):
 
     def test_save_method(self):
         """
-        Test if the save method updates `updated_at`.
+        Test if the save method updates `updated_at` and interacts with FileStorage.
         """
         instance = BaseModel()
         previous_updated_at = instance.updated_at
-        instance.save()
-        self.assertNotEqual(instance.updated_at, previous_updated_at)
-        self.assertTrue(instance.updated_at > previous_updated_at)
+
+        with patch('models.base_model.FileStorage') as MockFileStorage:
+            mock_storage_instance = MockFileStorage.return_value
+            instance.save()
+
+            # Check if `updated_at` is updated
+            self.assertNotEqual(instance.updated_at, previous_updated_at)
+            self.assertTrue(instance.updated_at > previous_updated_at)
+
+            # Check if FileStorage.new and FileStorage.save are called
+            mock_storage_instance.new.assert_called_with(instance)
+            mock_storage_instance.save.assert_called()
 
     def test_str_representation(self):
         """
