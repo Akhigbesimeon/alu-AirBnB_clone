@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import unittest
+from unittest.mock import patch
 from models.base_model import BaseModel
 from datetime import datetime
 from models.engine.file_storage import FileStorage
