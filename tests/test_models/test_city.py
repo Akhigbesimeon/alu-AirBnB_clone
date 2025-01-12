@@ -1,6 +1,7 @@
 #!usr/bin/python
-from models.city import City
 import unittest
+from models.city import City
+from models.engine.file_storage import FileStorage
 
 class TestCity(unittest.TestCase):
     """Test class for City"""
