@@ -13,27 +13,23 @@ class HBNBCommand(cmd.Cmd):
     """
     Command interpreter for the HBNB project.
     """
-    prompt = "(hbnb) "
-    classes = {
-        "BaseModel": BaseModel
-    }
+    prompt = "(hbnb) "  # Custom prompt for the console
+    classes = {"BaseModel": BaseModel}  # Supported classes
 
     def do_create(self, arg):
         """
-        Creates a new instance of BaseModel, saves it, and prints the id.
+        Creates a new instance of BaseModel, saves it to JSON, and prints the id.
         Usage: create <class name>
         """
         args = arg.split()
-        if len(args) == 0:
+        if not args:
             print("** class name missing **")
-            return
-        class_name = args[0]
-        if class_name not in self.classes:
+        elif args[0] not in self.classes:
             print("** class doesn't exist **")
-            return
-        instance = self.classes[class_name]()
-        instance.save()
-        print(instance.id)
+        else:
+            instance = self.classes[args[0]]()
+            instance.save()
+            print(instance.id)
 
     def do_show(self, arg):
         """
@@ -41,107 +37,89 @@ class HBNBCommand(cmd.Cmd):
         Usage: show <class name> <id>
         """
         args = arg.split()
-        if len(args) == 0:
+        if not args:
             print("** class name missing **")
-            return
-        class_name = args[0]
-        if class_name not in self.classes:
+        elif args[0] not in self.classes:
             print("** class doesn't exist **")
-            return
-        if len(args) < 2:
+        elif len(args) < 2:
             print("** instance id missing **")
-            return
-        instance_id = args[1]
-        key = f"{class_name}.{instance_id}"
-        if key not in storage.all():
-            print("** no instance found **")
-            return
-        print(storage.all()[key])
+        else:
+            key = f"{args[0]}.{args[1]}"
+            instance = storage.all().get(key)
+            if instance is None:
+                print("** no instance found **")
+            else:
+                print(instance)
 
     def do_destroy(self, arg):
         """
-        Deletes an instance based on class name and id.
+        Deletes an instance based on the class name and id.
         Usage: destroy <class name> <id>
         """
         args = arg.split()
-        if len(args) == 0:
+        if not args:
             print("** class name missing **")
-            return
-        class_name = args[0]
-        if class_name not in self.classes:
+        elif args[0] not in self.classes:
             print("** class doesn't exist **")
-            return
-        if len(args) < 2:
+        elif len(args) < 2:
             print("** instance id missing **")
-            return
-        instance_id = args[1]
-        key = f"{class_name}.{instance_id}"
-        if key not in storage.all():
-            print("** no instance found **")
-            return
-        del storage.all()[key]
-        storage.save()
+        else:
+            key = f"{args[0]}.{args[1]}"
+            if key not in storage.all():
+                print("** no instance found **")
+            else:
+                storage.all().pop(key)
+                storage.save()
 
     def do_all(self, arg):
         """
-        Prints all string representation of all instances based on the class name.
+        Prints all string representations of all instances or those of a specific class.
         Usage: all <class name> or all
         """
         args = arg.split()
-        if len(args) == 0:
-            print([str(obj) for obj in storage.all().values()])
-            return
-        class_name = args[0]
-        if class_name not in self.classes:
+        objects = storage.all()
+        if not args:
+            print([str(obj) for obj in objects.values()])
+        elif args[0] not in self.classes:
             print("** class doesn't exist **")
-            return
-        print([str(obj) for key, obj in storage.all().items() if key.startswith(class_name)])
+        else:
+            print([str(obj) for key, obj in objects.items() if key.startswith(f"{args[0]}.")])
 
     def do_update(self, arg):
         """
-        Updates an instance based on class name and id by adding/updating an attribute.
+        Updates an instance based on the class name and id by adding/updating an attribute.
         Usage: update <class name> <id> <attribute name> "<attribute value>"
         """
-        args = arg.split()
-        if len(args) == 0:
+        args = arg.split(maxsplit=3)
+        if not args:
             print("** class name missing **")
-            return
-        class_name = args[0]
-        if class_name not in self.classes:
+        elif args[0] not in self.classes:
             print("** class doesn't exist **")
-            return
-        if len(args) < 2:
+        elif len(args) < 2:
             print("** instance id missing **")
-            return
-        instance_id = args[1]
-        key = f"{class_name}.{instance_id}"
-        if key not in storage.all():
-            print("** no instance found **")
-            return
-        if len(args) < 3:
-            print("** attribute name missing **")
-            return
-        if len(args) < 4:
-            print("** value missing **")
-            return
-        attr_name = args[2]
-        attr_value = args[3].strip('"')
-        obj = storage.all()[key]
-        # Skip updating protected attributes
-        if attr_name not in ("id", "created_at", "updated_at"):
-            try:
-                attr_value = eval(attr_value)  # Cast to correct type
-            except (NameError, SyntaxError):
-                pass
-            setattr(obj, attr_name, attr_value)
-            obj.save()
-
-    def emptyline(self):
-        """
-        Overrides the default behavior when an empty line is entered.
-        Does nothing.
-        """
-        pass
+        else:
+            key = f"{args[0]}.{args[1]}"
+            instance = storage.all().get(key)
+            if instance is None:
+                print("** no instance found **")
+            elif len(args) < 3:
+                print("** attribute name missing **")
+            elif len(args) < 4:
+                print("** value missing **")
+            else:
+                attr_name = args[2]
+                attr_value = args[3].strip('"')
+                if attr_name not in ["id", "created_at", "updated_at"]:
+                    try:
+                        # Cast value to int, float, or keep it as a string
+                        if attr_value.isdigit():
+                            attr_value = int(attr_value)
+                        elif '.' in attr_value:
+                            attr_value = float(attr_value)
+                    except ValueError:
+                        pass
+                    setattr(instance, attr_name, attr_value)
+                    instance.save()
 
     def do_quit(self, arg):
         """
@@ -155,8 +133,15 @@ class HBNBCommand(cmd.Cmd):
         EOF command to exit the program.
         Usage: Press Ctrl+D
         """
-        print()
+        print()  # Print a newline for a clean exit
         return True
+
+    def emptyline(self):
+        """
+        Overrides the default behavior when an empty line is entered.
+        Does nothing.
+        """
+        pass
 
 
 if __name__ == '__main__':
