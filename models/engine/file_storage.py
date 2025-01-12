@@ -34,9 +34,7 @@ class FileStorage:
             json.dump(dict_representation, f)
 
     def reload(self):
-    """
-    Deserializes objects from the JSON file to storage.
-    """
+    """ Deserializes objects from the JSON file to storage."""
     try:
         with open(FileStorage.__file_path, 'r') as f:
             dict_representation = json.load(f)
@@ -50,4 +48,3 @@ class FileStorage:
         print("Warning: file.json is empty or corrupted, starting with an empty storage.")
         # Optionally create an empty file or handle this scenario
         pass
-
