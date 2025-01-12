@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+
 """
 Entry point of the command interpreter for the HBNB project.
 This module uses the cmd module to create an interactive shell.
@@ -33,5 +34,5 @@ class HBNBCommand(cmd.Cmd):
         """
         pass
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     HBNBCommand().cmdloop()
