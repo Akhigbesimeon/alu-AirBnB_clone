@@ -6,10 +6,13 @@ class BaseModel:
     def __init__(self, *args, **kwargs):
       pass
 
-        def __init__(self):
-        self.id = str(uuid.uuid4())
-        self.created_at = datetime.now()
-        self.updated_at = datetime.now()
+    def __init__(self):
+        """
+        Initializes a new instance of BaseModel.
+        """
+        self.id = str(uuid.uuid4())  # Assign unique id
+        self.created_at = datetime.now()  # Current datetime for creation
+        self.updated_at = datetime.now()  # Current datetime for updates
 
     def __str__(self):
         """
