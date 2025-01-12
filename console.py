@@ -1,6 +1,9 @@
 #!/usr/bin/python3
 import cmd
-
+"""
+Entry point of the command interpreter for the HBNB project.
+This module uses the cmd module to create an interactive shell.
+"""
 class HBNBCommand(cmd.Cmd):
     """
     Command interpreter for the HBNB project.
