@@ -10,6 +10,7 @@ try:
 except ModuleNotFoundError as e:
     raise ImportError("The 'models' module could not be found. Ensure it is located correctly.") from e
 
+
 class HBNBCommand(cmd.Cmd):
     """Command interpreter for the HBNB application"""
 
@@ -128,6 +129,7 @@ class HBNBCommand(cmd.Cmd):
     def emptyline(self):
         """Do nothing on empty input line."""
         pass
+
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
