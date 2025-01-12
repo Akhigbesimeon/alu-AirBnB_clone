@@ -31,12 +31,10 @@ class BaseModel:
         return f"[{self.__class__.__name__}] ({self.id}) {self.__dict__}"
 
     def save(self):
-        """
-        Updates the `updated_at` attribute with the current datetime.
-        """
-        self.updated_at = datetime.now()
+        # Create an instance of FileStorage and call save
+        storage = FileStorage()
         storage.save()
-
+  
     def to_dict(self):
         """
         Returns a dictionary representation of the instance.
