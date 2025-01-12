@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
 """
 Entry point of the command interpreter for the HBNB project.
@@ -32,7 +32,8 @@ class HBNBCommand(cmd.Cmd):
         Overrides the default behavior when an empty line is entered.
         Does nothing.
         """
-        pass
+        return  # Do nothing when an empty line is entered
+
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
