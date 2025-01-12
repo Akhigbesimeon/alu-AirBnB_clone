@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from models.engine.file_storage import FileStorage
 
 class BaseModel:
     """
@@ -31,17 +32,21 @@ class BaseModel:
         return f"[{self.__class__.__name__}] ({self.id}) {self.__dict__}"
 
     def save(self):
-        # Create an instance of FileStorage and call save
+        """
+        Updates the `updated_at` attribute with the current datetime and saves the instance.
+        """
+        self.updated_at = datetime.now()  # Update the `updated_at` field
         storage = FileStorage()
-        storage.save()
-  
+        storage.new(self)  # Add the instance to storage
+        storage.save()  # Save to the file
+
     def to_dict(self):
         """
         Returns a dictionary representation of the instance.
         """
         # Create a copy of __dict__ to ensure original data isn't modified
         dict_representation = self.__dict__.copy()
-        
+
         # Add class name to the dictionary
         dict_representation["__class__"] = self.__class__.__name__
 
