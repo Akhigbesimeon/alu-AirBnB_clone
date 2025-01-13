@@ -1,34 +1,44 @@
 #!/usr/bin/python3
-""" """
-from tests.test_models.test_base_model import test_basemodel
+"""test file for user class"""
+
+import unittest
 from models.user import User
 
 
-class test_User(test_basemodel):
-    """ """
+class TestUserModel(unittest.TestCase):
+    """creating a testcase class that inherits from unittest.TestCase"""
 
-    def __init__(self, *args, **kwargs):
-        """ """
-        super().__init__(*args, **kwargs)
-        self.name = "User"
-        self.value = User
+    def setUp(self):
+        """setting up the object for testing"""
+        self.user_model = User()
+
+    def test_instance(self):
+        self.assertIsInstance(self.user_model, User)
 
     def test_first_name(self):
-        """ """
-        new = self.value()
-        self.assertEqual(type(new.first_name), str)
+        self.assertIsInstance(self.user_model.first_name, str)
+        self.assertEqual(self.user_model.first_name, "")
+        self.user_model.first_name = "KMJ"
+        self.assertEqual(self.user_model.first_name, "KMJ")
 
     def test_last_name(self):
-        """ """
-        new = self.value()
-        self.assertEqual(type(new.last_name), str)
+        self.assertIsInstance(self.user_model.last_name, str)
+        self.assertEqual(self.user_model.last_name, "")
+        self.user_model.last_name = "JMK"
+        self.assertEqual(self.user_model.last_name, "JMK")
 
     def test_email(self):
-        """ """
-        new = self.value()
-        self.assertEqual(type(new.email), str)
+        self.assertIsInstance(self.user_model.email, str)
+        self.assertEqual(self.user_model.email, "")
+        self.user_model.email = "kmj@alueducation.com"
+        self.assertEqual(self.user_model.email, "kmj@alueducation.com")
 
     def test_password(self):
-        """ """
-        new = self.value()
-        self.assertEqual(type(new.password), str)
+        self.assertIsInstance(self.user_model.password, str)
+        self.assertEqual(self.user_model.password, "")
+        self.user_model.password = "1234"
+        self.assertEqual(self.user_model.password, "1234")
+
+
+if __name__ == "__main__":
+    unittest.main()
