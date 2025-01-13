@@ -1,116 +1,132 @@
+#!/usr/bin/python3
+"""
+This module contains the entry point of the command interpreter.
+"""
+
 import cmd
 from models.base_model import BaseModel
+from models.user import User
 from models import storage
 
+# List of valid classes
+classes = {"BaseModel": BaseModel, "User": User}
+
+
 class HBNBCommand(cmd.Cmd):
-    prompt = '(hbnb) '
+    """Command interpreter for AirBnB clone."""
 
-    def do_create(self, args):
-        """Creates a new instance of BaseModel"""
-        if not args:
+    prompt = "(hbnb) "
+
+    def do_quit(self, arg):
+        """Quit command to exit the program."""
+        return True
+
+    def do_EOF(self, arg):
+        """Exit the program with EOF signal."""
+        print()
+        return True
+
+    def emptyline(self):
+        """Override the default behavior to do nothing on an empty line."""
+        pass
+
+    def do_create(self, arg):
+        """Creates a new instance of BaseModel, saves it, and prints the id."""
+        if not arg:
             print("** class name missing **")
             return
-        if args not in storage.classes():
+        if arg not in classes:
             print("** class doesn't exist **")
             return
-        instance = storage.classes()[args]()
-        instance.save()
-        print(instance.id)
+        new_instance = eval(arg)()
+        storage.save()
+        print(new_instance.id)
 
-    def do_show(self, args):
-        """Shows the string representation of an instance"""
-        tokens = args.split()
-        if not tokens:
+    def do_show(self, arg):
+        """Prints the string representation of an instance based on class name and id."""
+        args = arg.split()
+        if len(args) == 0:
             print("** class name missing **")
             return
-        if tokens[0] not in storage.classes():
+        if args[0] not in classes:
             print("** class doesn't exist **")
             return
-        if len(tokens) < 2:
+        if len(args) < 2:
             print("** instance id missing **")
             return
-        key = f"{tokens[0]}.{tokens[1]}"
-        instance = storage.all().get(key)
-        if not instance:
+        key = f"{args[0]}.{args[1]}"
+        obj = storage.all().get(key)
+        if not obj:
             print("** no instance found **")
         else:
-            print(instance)
+            print(obj)
 
-    def do_destroy(self, args):
-        """Deletes an instance"""
-        tokens = args.split()
-        if not tokens:
+    def do_destroy(self, arg):
+        """Deletes an instance based on the class name and id."""
+        args = arg.split()
+        if len(args) == 0:
             print("** class name missing **")
             return
-        if tokens[0] not in storage.classes():
+        if args[0] not in classes:
             print("** class doesn't exist **")
             return
-        if len(tokens) < 2:
+        if len(args) < 2:
             print("** instance id missing **")
             return
-        key = f"{tokens[0]}.{tokens[1]}"
+        key = f"{args[0]}.{args[1]}"
         if key not in storage.all():
             print("** no instance found **")
         else:
             del storage.all()[key]
             storage.save()
 
-    def do_all(self, args):
-        """Prints all string representations of all instances"""
-        if args and args not in storage.classes():
+    def do_all(self, arg):
+        """Prints all string representations of all instances."""
+        objects = storage.all()
+        if not arg:
+            print([str(obj) for obj in objects.values()])
+            return
+        if arg not in classes:
             print("** class doesn't exist **")
             return
-        instances = []
-        for obj in storage.all().values():
-            if not args or obj.__class__.__name__ == args:
-                instances.append(str(obj))
-        print(instances)
+        print([str(obj) for key, obj in objects.items() if key.startswith(arg)])
 
-    def do_update(self, args):
-        """Updates an instance"""
-        tokens = args.split()
-        if not tokens:
+    def do_update(self, arg):
+        """
+        Updates an instance based on the class name and id by adding or updating attribute.
+        Usage: update <class name> <id> <attribute name> "<attribute value>"
+        """
+        args = arg.split()
+        if len(args) == 0:
             print("** class name missing **")
             return
-        if tokens[0] not in storage.classes():
+        if args[0] not in classes:
             print("** class doesn't exist **")
             return
-        if len(tokens) < 2:
+        if len(args) < 2:
             print("** instance id missing **")
             return
-        key = f"{tokens[0]}.{tokens[1]}"
-        instance = storage.all().get(key)
-        if not instance:
+        key = f"{args[0]}.{args[1]}"
+        obj = storage.all().get(key)
+        if not obj:
             print("** no instance found **")
             return
-        if len(tokens) < 3:
+        if len(args) < 3:
             print("** attribute name missing **")
             return
-        if len(tokens) < 4:
+        if len(args) < 4:
             print("** value missing **")
             return
-        attr_name = tokens[2]
-        attr_value = tokens[3].strip('"')
+        attr_name = args[2]
+        attr_value = args[3].strip('"')
+        # Cast the value to the correct type
+        if attr_value.isdigit():
+            attr_value = int(attr_value)
+        elif attr_value.replace('.', '', 1).isdigit():
+            attr_value = float(attr_value)
+        setattr(obj, attr_name, attr_value)
+        obj.save()
 
-        # Convert value to appropriate type
-        if hasattr(instance, attr_name):
-            attr_type = type(getattr(instance, attr_name))
-            attr_value = attr_type(attr_value)
-        setattr(instance, attr_name, attr_value)
-        instance.save()
 
-    def do_quit(self, args):
-        """Quit command to exit the program"""
-        return True
-
-    def do_EOF(self, args):
-        """Exit the program with EOF (Ctrl+D)"""
-        print()
-        return True
-
-    def emptyline(self):
-        """Do nothing on empty input line"""
-        pass
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     HBNBCommand().cmdloop()
