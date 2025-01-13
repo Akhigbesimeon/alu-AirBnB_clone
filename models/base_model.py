@@ -2,10 +2,7 @@ import uuid
 from datetime import datetime
 
 class BaseModel:
-    """
-    BaseModel class that defines all common attributes and methods for other classes.
-    """
-
+   
     def __init__(self, *args, **kwargs):
         """
         Initializes a new instance of BaseModel.
