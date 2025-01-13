@@ -9,17 +9,15 @@ class BaseModel:
         If kwargs is not empty, recreate an instance from dictionary representation.
         Otherwise, create a new instance with unique ID and current datetime.
         """
-        if kwargs:  # Recreate an instance from a dictionary
+        if kwargs:
             for key, value in kwargs.items():
-                if key == "created_at" or key == "updated_at":
-                    # Convert string to datetime
+                if key in ["created_at", "updated_at"]:
                     value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
-                if key != "__class__":
-                    setattr(self, key, value)
-        else:  # Create a new instance
-            self.id = str(uuid.uuid4())  # Assign unique ID
-            self.created_at = datetime.now()  # Current datetime for creation
-            self.updated_at = datetime.now()  # Current datetime for updates
+                setattr(self, key, value)
+        else:
+            self.id = str(uuid.uuid4())
+            self.created_at = datetime.now()
+            self.updated_at = datetime.now()
 
     def __str__(self):
         """
