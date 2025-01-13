@@ -5,6 +5,7 @@ import sys
 import cmd
 import shutil
 import os
+import console
 
 # Cleanup file storage
 file_path = "file.json"
@@ -39,8 +40,6 @@ with open("tmp_console_main.py", "r") as file_i:
             else:
                 file_o.write(line)
 
-import console
-
 # Create console object
 console_obj = "HBNBCommand"
 for name, obj in inspect.getmembers(console):
@@ -50,7 +49,10 @@ for name, obj in inspect.getmembers(console):
 my_console = console_obj(stdout=io.StringIO(), stdin=io.StringIO())
 my_console.use_rawinput = False
 
+
 # Execute command
+
+
 def exec_command(my_console, the_command, last_lines=1):
     my_console.stdout = io.StringIO()
     real_stdout = sys.stdout
@@ -59,6 +61,7 @@ def exec_command(my_console, the_command, last_lines=1):
     sys.stdout = real_stdout
     lines = my_console.stdout.getvalue().split("\n")
     return "\n".join(lines[(-1 * (last_lines + 1)):-1])
+
 
 # Tests
 state_name = "California"
