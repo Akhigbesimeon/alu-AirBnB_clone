@@ -29,7 +29,7 @@ class HBNBCommand(cmd.Cmd):
                 instance = models.dict_classes[arg]()
                 instance.save()
                 print(instance.id)
-            except:
+            except KeyError:
                 print("** class doesn't exist **")
 
     def do_show(self, arg):
