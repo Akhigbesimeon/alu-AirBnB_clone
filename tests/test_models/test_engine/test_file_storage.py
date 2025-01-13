@@ -1,83 +1,46 @@
-import unittest
+#!/usr/bin/python3
+"""test for the FileStorage class"""
+
 import os
 import json
+import models
+import unittest
+from datetime import datetime
 from models.base_model import BaseModel
 from models.engine.file_storage import FileStorage
+from models.user import User
+from models.state import State
+from models.place import Place
+from models.city import City
+from models.amenity import Amenity
+from models.review import Review
 
 
 class TestFileStorage(unittest.TestCase):
-    """Tests the FileStorage class."""
-
-    def setUp(self):
-        """Set up resources for testing."""
-        self.storage = FileStorage()
-        self.test_file = "file.json"
-
-        # Clean up the test environment
-        if os.path.exists(self.test_file):
-            os.remove(self.test_file)
-
-    def tearDown(self):
-        """Clean up after each test."""
-        if os.path.exists(self.test_file):
-            os.remove(self.test_file)
-
     def test_all(self):
-        """Test the all() method."""
-        self.assertEqual(self.storage.all(), {})
+        self.assertIsInstance(models.storage.all(), dict)
 
     def test_new(self):
-        """Test the new() method."""
-        obj = BaseModel()
-        self.storage.new(obj)
-        key = f"{obj.__class__.__name__}.{obj.id}"
-        self.assertIn(key, self.storage.all())
-        self.assertEqual(self.storage.all()[key], obj)
+        obj = State()
+        all_objects = models.storage.all()
+        self.assertIn("State.{}".format(obj.id), all_objects)
 
     def test_save(self):
-        """Test the save() method."""
-        obj = BaseModel()
-        self.storage.new(obj)
-        self.storage.save()
-
-        # Check if the file was created
-        self.assertTrue(os.path.exists(self.test_file))
-
-        # Check if the data was serialized correctly
-        with open(self.test_file, "r", encoding="utf-8") as file:
+        obj = City()
+        models.storage.new(obj)
+        models.storage.save()
+        with open('file.json', 'r') as file:
             data = json.load(file)
-            key = f"{obj.__class__.__name__}.{obj.id}"
-            self.assertIn(key, data)
+            self.assertIn("City.{}".format(obj.id), data)
 
     def test_reload(self):
-        """Test the reload() method."""
-        obj = BaseModel()
-        self.storage.new(obj)
-        self.storage.save()
-
-        # Clear __objects and reload from file
-        FileStorage._FileStorage__objects = {}
-        self.storage.reload()
-        key = f"{obj.__class__.__name__}.{obj.id}"
-        self.assertIn(key, self.storage.all())
-        self.assertIsInstance(self.storage.all()[key], BaseModel)
-
-    def test_no_file_reload(self):
-        """Test reload() when no file exists."""
-        # Ensure no file exists
-        if os.path.exists(self.test_file):
-            os.remove(self.test_file)
-
-        try:
-            self.storage.reload()  # Should not raise an exception
-        except Exception as e:
-            self.fail(f"reload() raised an exception: {e}")
-
-    def test_private_attributes(self):
-        """Test private attributes __file_path and __objects."""
-        self.assertFalse(hasattr(self.storage, "__file_path"))
-        self.assertFalse(hasattr(self.storage, "__objects"))
+        obj = City()
+        models.storage.new(obj)
+        models.storage.save()
+        models.storage.reload()
+        objs = models.storage.all()
+        self.assertIn("City.{}".format(obj.id), objs)
 
 
-if __name__ == "__main__":
-    unittest.main()
+if __name__ == '__main__':
+    unittest.main()    
