@@ -1,12 +1,13 @@
 import uuid
 from datetime import datetime
 
+
 class BaseModel:
-   
+
     def __init__(self, *args, **kwargs):
         """
         Initializes a new instance of BaseModel.
-        If kwargs is not empty, recreate an instance from dictionary representation.
+        If kwargs is not empty,  from dictionary representation.
         Otherwise, create a new instance with unique ID and current datetime.
         """
         if kwargs:  # Recreate an instance from a dictionary
@@ -29,7 +30,7 @@ class BaseModel:
 
     def save(self):
         """
-        Updates the `updated_at` attribute with the current datetime and saves the instance.
+        Updates the `updated_at` attribute .
         """
         self.updated_at = datetime.now()  # Update the `updated_at` field
         # Lazy import to avoid circular import
@@ -40,9 +41,9 @@ class BaseModel:
 
     def to_dict(self):
         """
-        Returns a dictionary representation of the instance that is JSON serializable.
+        Returns a dictionary representation .
         """
-        dict_representation = self.__dict__.copy()  # Copy the instance's dictionary
+        dict_representation = self.__dict__.copy()
 
         # Convert datetime attributes to ISO format strings
         dict_representation["created_at"] = self.created_at.isoformat()
