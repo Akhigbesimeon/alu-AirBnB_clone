@@ -6,21 +6,21 @@ import models
 
 class HBNBCommand(cmd.Cmd):
     """Class for the console, inheriting from cmd.Cmd"""
-    prompt = '(hbnb) '
+    prompt = "(hbnb)"
 
-    def do_quit(self, arg):
+ def do_quit(self, arg):
         """Exit the program."""
         return True
 
-    def do_EOF(self, arg):
+def do_EOF(self, arg):
         """Exit the program with EOF (Ctrl+D)."""
         return True
 
-    def emptyline(self):
+ def emptyline(self):
         """Do nothing on an empty line."""
         pass
 
-    def do_create(self, arg):
+def do_create(self, arg):
         """Create a new instance of BaseModel."""
         if not arg:
             print("** class name missing **")
@@ -32,7 +32,7 @@ class HBNBCommand(cmd.Cmd):
         except KeyError:
             print("** class doesn't exist **")
 
-    def do_show(self, arg):
+  def do_show(self, arg):
         """Show the string representation of an instance."""
         args = arg.split()
         if not args:
@@ -46,7 +46,7 @@ class HBNBCommand(cmd.Cmd):
             obj = models.storage.all().get(instance_key)
             print(obj if obj else "** no instance found **")
 
-    def do_destroy(self, arg):
+def do_destroy(self, arg):
         """Delete an instance based on the class name and ID."""
         args = arg.split()
         if not args:
@@ -63,7 +63,7 @@ class HBNBCommand(cmd.Cmd):
             else:
                 print("** no instance found **")
 
-    def do_all(self, arg):
+def do_all(self, arg):
         """Show all instances of a class (or all if no class is provided)."""
         args = arg.split()
         if not arg:
@@ -76,7 +76,7 @@ class HBNBCommand(cmd.Cmd):
                 if key.startswith(args[0]):
                     print(obj)
 
-    def do_update(self, arg):
+ def do_update(self, arg):
         """Update an instance based on class name and ID."""
         args = arg.split()
         if not args:

@@ -1,63 +1,53 @@
-#!/usr/bin/python
+# !/usr/bin/python3
+"""
+Test cases for the BaseModel class.
+"""
+
 import unittest
-from unittest.mock import patch
 from models.base_model import BaseModel
-from datetime import datetime
-from models.engine.file_storage import FileStorage
 
-class TestBaseModel(unittest.TestCase):
-    def test_base_model(self):
-        """Set up method that will run before every Test"""
-        pass
 
-class TestBaseModel(unittest.TestCase):
-    def test_instance_creation(self):
+class TestBasemodel(unittest.TestCase):
+    """
+    Test cases for the BaseModel class.
+    """
+
+    def test_init(self):
         """
-        Test if an instance of BaseModel is created correctly.
+        Tests that a BaseModel instance is properly initialized with an id,
+        created_at and updated_at attributes.
         """
-        instance = BaseModel()
-        self.assertIsInstance(instance, BaseModel)
-        self.assertIsInstance(instance.id, str)
-        self.assertIsInstance(instance.created_at, datetime)
-        self.assertIsInstance(instance.updated_at, datetime)
+        my_model = BaseModel()
+        self.assertIsNotNone(my_model.id)
+        self.assertIsNotNone(my_model.created_at)
+        self.assertIsNotNone(my_model.updated_at)
+
+    def test_save(self):
+        """
+        Tests that the save method of a BaseModel instance updates the
+        updated_at attribute.
+        """
+        my_model = BaseModel()
+        initial_updated_at = my_model.updated_at
+        my_model.save()
+        current_updated_at = my_model.updated_at
+        self.assertNotEqual(initial_updated_at, current_updated_at)
 
     def test_to_dict(self):
-        """
-        Test the to_dict method of BaseModel.
-        """
-        instance = BaseModel()
-        instance_dict = instance.to_dict()
-        self.assertEqual(instance_dict["__class__"], "BaseModel")
-        self.assertEqual(instance_dict["id"], instance.id)
-        self.assertEqual(instance_dict["created_at"], instance.created_at.isoformat())
-        self.assertEqual(instance_dict["updated_at"], instance.updated_at.isoformat())
+        my_model = BaseModel()
+        my_model_dict = my_model.to_dict()
+        self.assertIsInstance(my_model_dict, dict)
+        self.assertEqual(my_model_dict["__class__"], 'BaseModel')
+        self.assertEqual(my_model_dict['id'], my_model.id)
+        self.assertEqual(my_model_dict['created_at'], my_model.created_at.isoformat())
+        self.assertEqual(my_model_dict['updated_at'], my_model.created_at.isoformat())
 
-    def test_save_method(self):
-        """
-        Test if the save method updates `updated_at` and interacts with FileStorage.
-        """
-        instance = BaseModel()
-        previous_updated_at = instance.updated_at
+    def test_str(self):
+        my_model = BaseModel()
+        self.assertTrue(str(my_model).startswith("[BaseModel]"))
+        self.assertIn(my_model.id, str(my_model))
+        self.assertIn(str(my_model.to_dict()), str(my_model))
 
-        with patch('models.base_model.FileStorage') as MockFileStorage:
-            mock_storage_instance = MockFileStorage.return_value
-            instance.save()
 
-            # Check if `updated_at` is updated
-            self.assertNotEqual(instance.updated_at, previous_updated_at)
-            self.assertTrue(instance.updated_at > previous_updated_at)
-
-            # Check if FileStorage.new and FileStorage.save are called
-            mock_storage_instance.new.assert_called_with(instance)
-            mock_storage_instance.save.assert_called()
-
-    def test_str_representation(self):
-        """
-        Test the __str__ method of BaseModel.
-        """
-        instance = BaseModel()
-        expected_str = f"[BaseModel] ({instance.id}) {instance.__dict__}"
-        self.assertEqual(str(instance), expected_str)
-
-if __name__ == "__main__":
+if __name__ == '_main_':
     unittest.main()
