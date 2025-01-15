@@ -1,19 +1,22 @@
 #!/usr/bin/python3
-"""The __init__ method for the models package."""
 
+"""
+This module serves as the initialization file for the models package.
+"""
+from models.engine.file_storage import FileStorage
 from models.base_model import BaseModel
 from models.user import User
 from models.state import State
 from models.city import City
 from models.amenity import Amenity
-from models.review import Review
 from models.place import Place
-from models.engine.file_storage import FileStorage
+from models.review import Review
 
 storage = FileStorage()
 storage.reload()
+loaded_objects = storage.all()
 
-dict_classes = {
+classes = {
     "BaseModel": BaseModel,
     "User": User,
     "State": State,
