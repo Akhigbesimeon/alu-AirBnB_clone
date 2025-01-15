@@ -1,9 +1,15 @@
-#!/usr/bin/python
+#!/usr/bin/python3
+"""Place class"""
 from models.base_model import BaseModel
 
 
 class Place(BaseModel):
-    """Represents a place."""
+    """
+    Place class
+    """
+
+    city_id = ""
+    user_id = ""
     name = ""
     description = ""
     number_rooms = 0
