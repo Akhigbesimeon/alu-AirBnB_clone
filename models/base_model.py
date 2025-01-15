@@ -1,14 +1,14 @@
 import uuid
 from datetime import datetime
-
+from models.engine.file_storage import FileStorage
 
 class BaseModel:
 
     def __init__(self, *args, **kwargs):
         """
         Initializes a new instance of BaseModel.
-        If kwargs is not empty,  from dictionary representation.
-        Otherwise, create a new instance with unique ID and current datetime.
+        If kwargs is provided, loads attributes from dictionary representation.
+        Otherwise, creates a new instance with a unique ID and timestamps.
         """
         if kwargs:
             for key, value in kwargs.items():
@@ -28,31 +28,19 @@ class BaseModel:
 
     def save(self):
         """
-        Updates the `updated_at` attribute .
+        Updates the `updated_at` attribute and saves the instance to storage.
         """
         self.updated_at = datetime.now()  # Update the `updated_at` field
-        # Lazy import to avoid circular import
-        from models.engine.file_storage import FileStorage
-        storage = FileStorage()
-        storage.new(self)  # Add the instance to storage
-        storage.save()  # Save to the file
+        storage = FileStorage()  # FileStorage manages saving objects
+        storage.new(self)
+        storage.save()
 
     def to_dict(self):
         """
-        Returns a dictionary representation .
+        Returns a dictionary representation of the BaseModel instance.
         """
         dict_representation = self.__dict__.copy()
-
-        # Convert datetime attributes to ISO format strings
         dict_representation["created_at"] = self.created_at.isoformat()
         dict_representation["updated_at"] = self.updated_at.isoformat()
-
-        # Add class name to the dictionary for identification
         dict_representation["__class__"] = self.__class__.__name__
-
-        # Ensure all values in the dictionary are JSON serializable
-        for key, value in dict_representation.items():
-            if isinstance(value, datetime):
-                dict_representation[key] = value.isoformat()
-
         return dict_representation
