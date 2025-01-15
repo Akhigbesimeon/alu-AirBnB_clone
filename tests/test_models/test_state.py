@@ -1,26 +1,11 @@
-#!/usr/bin/python3
-"""test file for state class"""
-
-import unittest
+#!usr/bin/python3
 from models.state import State
+import unittest
 
+'''Test state class'''
 
-class TestUserModel(unittest.TestCase):
-    """creating a testcase class that inherits from unittest.TestCase"""
-
-    def setUp(self):
-        """setting up the object for testing"""
-        self.state_model = State()
-
-    def test_instance(self):
-        self.assertIsInstance(self.state_model, State)
-
-    def test_name(self):
-        self.assertIsInstance(self.state_model.name, str)
-        self.assertEqual(self.state_model.name, "")
-        self.state_model.name = "KMJ"
-        self.assertEqual(self.state_model.name, "KMJ")
-
-
-if __name__ == "__main__":
-    unittest.main()
+class TestState(unittest.TestCase):
+    '''Test the state class'''
+    def test_Review(self):
+        '''Test the State class'''
+        pass

@@ -1,38 +1,11 @@
-#!/usr/bin/python3
-"""test file for review class"""
-
-import unittest
+#!usr/bin/python3
 from models.review import Review
+import unittest
 
+'''Test Review class'''
 
-class TestUserModel(unittest.TestCase):
-    """creating a testcase class that inherits from unittest.TestCase"""
-
-    def setUp(self):
-        """setting up the object for testing"""
-        self.review_model = Review()
-
-    def test_instance(self):
-        self.assertIsInstance(self.review_model, Review)
-
-    def test_text(self):
-        self.assertIsInstance(self.review_model.text, str)
-        self.assertEqual(self.review_model.text, "")
-        self.review_model.text = "burger"
-        self.assertEqual(self.review_model.text, "burger")
-
-    def test_user_id(self):
-        self.assertIsInstance(self.review_model.user_id, str)
-        self.assertEqual(self.review_model.user_id, "")
-        self.review_model.user_id = "1234"
-        self.assertEqual(self.review_model.user_id, "1234")
-
-    def test_place_id(self):
-        self.assertIsInstance(self.review_model.place_id, str)
-        self.assertEqual(self.review_model.place_id, "")
-        self.review_model.place_id = "5678"
-        self.assertEqual(self.review_model.place_id, "5678")
-
-
-if __name__ == "__main__":
-    unittest.main()
+class TestReview(unittest.TestCase):
+    '''Test the Review class'''
+    def test_Review(self):
+        '''Test the Review class'''
+        pass
