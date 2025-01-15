@@ -1,0 +1,19 @@
+# Ignore Python bytecode files
+__pycache__/
+
+# Ignore IDE files
+.vscode/
+*.swp
+*.swo
+*.swn
+*.swm
+
+# Ignore test files
+tests/__pycache__/
+tests/test_models/__pycache__/
+
+#ignore .json files
+*.json
+
+
+test_save_reload_base_model.py
