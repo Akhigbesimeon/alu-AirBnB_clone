@@ -2,39 +2,40 @@
 """Command line interpreter"""
 import cmd
 import models
-
+import shlex
 
 class HBNBCommand(cmd.Cmd):
     """Class for the console, inheriting from cmd.Cmd"""
     prompt = "(hbnb)"
 
- def do_quit(self, arg):
+    def do_quit(self, arg):
         """Exit the program."""
         return True
 
-def do_EOF(self, arg):
+    def do_EOF(self, arg):
         """Exit the program with EOF (Ctrl+D)."""
         return True
 
- def emptyline(self):
+    def emptyline(self):
         """Do nothing on an empty line."""
         pass
 
-def do_create(self, arg):
+    def do_create(self, arg):
         """Create a new instance of BaseModel."""
-        if not arg:
+        args = shlex.split(arg)
+        if not args:
             print("** class name missing **")
             return
         try:
-            instance = models.dict_classes[arg]()
+            instance = models.dict_classes[args[0]]()
             instance.save()
             print(instance.id)
         except KeyError:
             print("** class doesn't exist **")
 
-  def do_show(self, arg):
+    def do_show(self, arg):
         """Show the string representation of an instance."""
-        args = arg.split()
+        args = shlex.split(arg)
         if not args:
             print("** class name missing **")
         elif args[0] not in models.dict_classes:
@@ -46,9 +47,9 @@ def do_create(self, arg):
             obj = models.storage.all().get(instance_key)
             print(obj if obj else "** no instance found **")
 
-def do_destroy(self, arg):
+    def do_destroy(self, arg):
         """Delete an instance based on the class name and ID."""
-        args = arg.split()
+        args = shlex.split(arg)
         if not args:
             print("** class name missing **")
         elif args[0] not in models.dict_classes:
@@ -63,10 +64,10 @@ def do_destroy(self, arg):
             else:
                 print("** no instance found **")
 
-def do_all(self, arg):
+    def do_all(self, arg):
         """Show all instances of a class (or all if no class is provided)."""
-        args = arg.split()
-        if not arg:
+        args = shlex.split(arg)
+        if not args:
             for obj in models.storage.all().values():
                 print(obj)
         elif args[0] not in models.dict_classes:
@@ -76,9 +77,9 @@ def do_all(self, arg):
                 if key.startswith(args[0]):
                     print(obj)
 
- def do_update(self, arg):
+    def do_update(self, arg):
         """Update an instance based on class name and ID."""
-        args = arg.split()
+        args = shlex.split(arg)
         if not args:
             print("** class name missing **")
         elif args[0] not in models.dict_classes:
@@ -102,7 +103,6 @@ def do_all(self, arg):
                 obj.save()
             else:
                 print("** no instance found **")
-
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
