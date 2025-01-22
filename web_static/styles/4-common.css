@@ -1,0 +1,33 @@
+body
+{
+    margin:0;
+    padding:0;
+    font: #484848;
+    font-size: 14px;
+    font-family: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+.container
+{
+    max-width: 1000px;
+    margin: 30px auto;
+}
+.popover {
+	margin-top:19.5px;
+	box-sizing: border-box;
+	z-index: 1;
+	padding: 20px;
+	background: #FAFAFA;
+	border:1px solid #DDDDDD;
+	border-radius: 4px;
+	width: 113%;
+    height:fit-content;
+	display: none;
+}
+.popover ul
+{
+    margin-top: 0;
+}
+.popover li
+{
+    margin-left: -20px;
+}
